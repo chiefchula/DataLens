@@ -115,8 +115,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link active" data-scroll-target="#the-problem">The problem</a></li>
+  <li><a href="#what-the-raw-data-looks-like" id="toc-what-the-raw-data-looks-like" class="nav-link" data-scroll-target="#what-the-raw-data-looks-like">What the raw data looks like</a></li>
+  <li><a href="#how-i-cleaned-it" id="toc-how-i-cleaned-it" class="nav-link" data-scroll-target="#how-i-cleaned-it">How I cleaned it</a>
+  <ul class="collapse">
+  <li><a href="#assumptions" id="toc-assumptions" class="nav-link" data-scroll-target="#assumptions">Assumptions</a></li>
+  </ul></li>
+  <li><a href="#validation" id="toc-validation" class="nav-link" data-scroll-target="#validation">Validation</a></li>
+  <li><a href="#before-and-after" id="toc-before-and-after" class="nav-link" data-scroll-target="#before-and-after">Before and After</a></li>
+  <li><a href="#findings" id="toc-findings" class="nav-link" data-scroll-target="#findings">Findings</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -144,13 +159,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># clean workspace --------------------------------------------------------------</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># attach required packages -----------------------------------------------------</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, janitor, skimr)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>messy_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/messy/messy_customer_data.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyverse' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyr' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'dplyr' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'stringr' was built under R version 4.3.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   4.0.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>messy_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/messy/messy_customer_data.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 10000 Columns: 12
@@ -162,9 +206,17 @@ dbl  (2): Age, feedback_score
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
+</div>
+<section id="the-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem">The problem</h2>
+<p>A customer dataset of 10,000 rows and 12 columns (from Kaggle) with mixed formats, placeholder value, impossible numbers and lot of missing data. The goal: clean it without inventing any values, and measure the improvement column by column.</p>
+</section>
+<section id="what-the-raw-data-looks-like" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-raw-data-looks-like">What the raw data looks like</h2>
+<div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(messy_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(messy_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 10,000
@@ -182,339 +234,230 @@ $ email              &lt;chr&gt; NA, "user1mail.com", "user2@mail.com", NA, "use
 $ Phone_number       &lt;chr&gt; "0", "abc123", "abc123", "9316267914", "9234603292"…
 $ Country            &lt;chr&gt; "Canada", "Canada", "India", "USA", "USA", "UK", "A…</code></pre>
 </div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(messy_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>  CustomerID            Name              Gender               Age       
- Length:10000       Length:10000       Length:10000       Min.   : -5.0  
- Class :character   Class :character   Class :character   1st Qu.: -5.0  
- Mode  :character   Mode  :character   Mode  :character   Median : 43.0  
-                                                          Mean   : 78.9  
-                                                          3rd Qu.:200.0  
-                                                          Max.   :200.0  
-                                                          NA's   :2576   
-     City           Signup_Date        Last_purchase_date purchase_amount   
- Length:10000       Length:10000       Length:10000       Length:10000      
- Class :character   Class :character   Class :character   Class :character  
- Mode  :character   Mode  :character   Mode  :character   Mode  :character  
-                                                                            
-                                                                            
-                                                                            
-                                                                            
- feedback_score      email           Phone_number         Country         
- Min.   :-1.000   Length:10000       Length:10000       Length:10000      
- 1st Qu.:-1.000   Class :character   Class :character   Class :character  
- Median : 3.000   Mode  :character   Mode  :character   Mode  :character  
- Mean   : 4.008                                                           
- 3rd Qu.:10.000                                                           
- Max.   :10.000                                                           
- NA's   :2462                                                             </code></pre>
 </div>
+<p>Problems found - <strong>CustomerID:</strong> mixed format (<code>C2</code> vs <code>3</code>) - <strong>Gender:</strong> <code>F</code>, <code>Female</code>, <code>female</code>, <code>male</code>, <code>Male</code> - <strong>Age:</strong> impossible values (<code>-5</code>, <code>200</code>) - <strong>Dates:</strong> stored as text (dd/mm/yyyy) with junk like <code>not_a_date</code> - <strong>purchase_amount:</strong> text, with <code>-999</code> and <code>N/A</code> used as placeholders - <strong>feedback_score:</strong> <code>-1</code> used as a “no answer” code - <strong>email:</strong> some missing the <code>@</code> - <strong>Phone_number:</strong> values like <code>abc123</code> and <code>0</code></p>
+</section>
+<section id="how-i-cleaned-it" class="level2">
+<h2 class="anchored" data-anchor-id="how-i-cleaned-it">How I cleaned it</h2>
+<div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colSums</span>(<span class="fu">is.na</span>(messy_data))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>clean_2 <span class="ot">&lt;-</span> messy_data <span class="sc">|&gt;</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Keep the number and standardise the "C" prefix</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">customer_id =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(CustomerID), <span class="cn">NA_character_</span>,<span class="fu">paste0</span>(<span class="st">"C"</span>,<span class="fu">parse_number</span>(CustomerID))),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">customer_name =</span> <span class="fu">str_to_title</span>(Name),</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># standardise gender to Male / Female (Case-insensitive)</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">gender =</span> <span class="fu">case_when</span>(</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_to_lower</span>(Gender) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"f"</span>, <span class="st">"female"</span>) <span class="sc">~</span> <span class="st">"Female"</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_to_lower</span>(Gender) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"m"</span>, <span class="st">"male"</span>) <span class="sc">~</span> <span class="st">"Male"</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># impossible ages become missing</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">if_else</span>(Age <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">|</span> Age <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="cn">NA_real_</span>, Age),</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">city =</span> <span class="fu">str_to_title</span>(City),</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># text date (dd/mm/yyyy) become real dates; junk becomes NA</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">signup_date =</span> <span class="fu">dmy</span>(Signup_Date, <span class="at">quiet =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">last_purchase_date =</span> <span class="fu">dmy</span>(Last_purchase_date, <span class="at">quiet =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># placeholders become missing, then convert to numeric</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">purchase_amount_clean =</span> <span class="fu">parse_number</span>(</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(purchase_amount <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"N/A"</span>, <span class="st">"-999"</span>), <span class="cn">NA_character_</span>, purchase_amount)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># -1 means "no answer"</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">feedback_score =</span> <span class="fu">if_else</span>(feedback_score <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="cn">NA_real_</span>, feedback_score),</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># repair emails missing the "@" before "mail.com"</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">email_cleaned =</span> <span class="fu">case_when</span>(</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(email) <span class="sc">~</span> <span class="cn">NA_character_</span>,</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_detect</span>(email, <span class="st">"@"</span>) <span class="sc">~</span> email,</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_detect</span>(email, <span class="st">"mail</span><span class="sc">\\</span><span class="st">.com$"</span>) <span class="sc">~</span> <span class="fu">str_replace</span>(email, <span class="st">"mail</span><span class="sc">\\</span><span class="st">.com$"</span>, <span class="st">"@mail.com"</span>),</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># phone numbers must be exactly 10 digits</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">phone_number =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(Phone_number, <span class="st">"^</span><span class="sc">\\</span><span class="st">d{10}$"</span>),</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>                           Phone_number, <span class="cn">NA_character_</span>),</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">country =</span> <span class="fu">str_squish</span>(Country)</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(customer_id, customer_name, gender, age, city, signup_date, last_purchase_date, purchase_amount_clean, feedback_score, email_cleaned, phone_number, country) <span class="sc">|&gt;</span> </span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">purchase_amount =</span> purchase_amount_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>        CustomerID               Name             Gender                Age 
-              2379               1658               2455               2576 
-              City        Signup_Date Last_purchase_date    purchase_amount 
-              1130               2529               3286               2500 
-    feedback_score              email       Phone_number            Country 
-              2462               5066               2444               1704 </code></pre>
 </div>
+<section id="assumptions" class="level3">
+<h3 class="anchored" data-anchor-id="assumptions">Assumptions</h3>
+<ul>
+<li>Invalid values become <code>NA</code>. Nothing is guessed or filled in, and no rows are dropped.</li>
+<li><code>-1</code> in <code>feedback_score</code> is treated as “no answer”. Scores of <code>10</code> are kept as valid, although the rest of the scale looks like 1 to 5.</li>
+<li>A broken email is assumed to be missing only the ‘@’ before <code>mail.com</code></li>
+<li>Dates are read as day/month/year.</li>
+</ul>
+</section>
+</section>
+<section id="validation" class="level2">
+<h2 class="anchored" data-anchor-id="validation">Validation</h2>
+<div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">duplicated</span>((messy_data)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>email_pattern <span class="ot">&lt;-</span> <span class="st">"^[^@</span><span class="sc">\\</span><span class="st">s]+@[^@</span><span class="sc">\\</span><span class="st">s]+</span><span class="sc">\\</span><span class="st">.[^@</span><span class="sc">\\</span><span class="st">s]+$"</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>checks <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>check,                                  <span class="sc">~</span>passed,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Row count preserved"</span>,                   <span class="fu">nrow</span>(clean_2) <span class="sc">==</span> <span class="fu">nrow</span>(messy_data),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"No double @ in emails"</span>,                 <span class="fu">sum</span>(<span class="fu">str_count</span>(clean_2<span class="sc">$</span>email_cleaned, <span class="st">"@"</span>) <span class="sc">&gt;</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">==</span> <span class="dv">0</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"All emails match a valid pattern"</span>,      <span class="fu">all</span>(<span class="fu">str_detect</span>(clean_2<span class="sc">$</span>email_cleaned, email_pattern), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Gender only Male / Female / NA"</span>,        <span class="fu">all</span>(clean_2<span class="sc">$</span>gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>, <span class="cn">NA</span>)),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Age within 0 to 100"</span>,                   <span class="fu">all</span>(clean_2<span class="sc">$</span>age <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> clean_2<span class="sc">$</span>age <span class="sc">&lt;=</span> <span class="dv">100</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"purchase_amount numeric and positive"</span>,  <span class="fu">is.numeric</span>(clean_2<span class="sc">$</span>purchase_amount) <span class="sc">&amp;&amp;</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>                                           <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(clean_2<span class="sc">$</span>purchase_amount)) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                                           <span class="fu">all</span>(clean_2<span class="sc">$</span>purchase_amount <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Phones are 10 digits"</span>,                  <span class="fu">all</span>(<span class="fu">str_detect</span>(clean_2<span class="sc">$</span>phone_number, <span class="st">"^</span><span class="sc">\\</span><span class="st">d{10}$"</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">result =</span> <span class="fu">if_else</span>(passed, <span class="st">"PASS"</span>, <span class="st">"FAIL"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(check, result)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(checks)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0</code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">check</th>
+<th style="text-align: left;">result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Row count preserved</td>
+<td style="text-align: left;">PASS</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">No double @ in emails</td>
+<td style="text-align: left;">PASS</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">All emails match a valid pattern</td>
+<td style="text-align: left;">PASS</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Gender only Male / Female / NA</td>
+<td style="text-align: left;">PASS</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Age within 0 to 100</td>
+<td style="text-align: left;">PASS</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">purchase_amount numeric and positive</td>
+<td style="text-align: left;">PASS</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Phones are 10 digits</td>
+<td style="text-align: left;">PASS</td>
+</tr>
+</tbody>
+</table>
 </div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dataset assessment scorecard  ------------------------------------------------</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>invalid_counts <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">column =</span> <span class="fu">c</span>(<span class="st">"CustomerID"</span>, <span class="st">"Gender"</span>, <span class="st">"Age"</span>, <span class="st">"Signup_Date"</span>, </span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Last_purchase_date"</span>, <span class="st">"purchase_amount"</span>, <span class="st">"email"</span>, </span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Phone_number"</span>, <span class="st">"Country"</span>),</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">missing =</span> <span class="fu">c</span>(</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>CustomerID)), </span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>Gender)),</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>Age)),</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>Signup_Date)),</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>Last_purchase_date)),</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>purchase_amount)),</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sum(is.na(messy_data$feedback_score)),</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>email)),</span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>Phone_number)),</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>Country))</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  ),</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">invalid =</span> <span class="fu">c</span>(</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>,</span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(messy_data<span class="sc">$</span>Gender) <span class="sc">&amp;</span> <span class="sc">!</span>(messy_data <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Male"</span>,<span class="st">"Female"</span>))),</span>
-<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(messy_data<span class="sc">$</span>Age <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">|</span> messy_data<span class="sc">$</span>Age <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>Signup_Date) <span class="sc">&amp;</span> <span class="fu">is.na</span>(<span class="fu">suppressWarnings</span>(<span class="fu">dmy</span>(messy_data<span class="sc">$</span>Signup_Date)))),</span>
-<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="fu">is.na</span>(messy_data<span class="sc">$</span>Last_purchase_date) <span class="sc">&amp;</span> <span class="fu">is.na</span>(<span class="fu">suppressWarnings</span>(<span class="fu">dmy</span>(messy_data<span class="sc">$</span>Last_purchase_date)))),</span>
-<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(messy_data<span class="sc">$</span>purchase_amount <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"-999"</span>, <span class="st">"N/A"</span>)),</span>
-<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(messy_data<span class="sc">$</span>feedback_score <span class="sc">==</span> <span class="sc">-</span><span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(messy_data<span class="sc">$</span>email) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">str_detect</span>(messy_data<span class="sc">$</span>email, <span class="st">"^[^@</span><span class="sc">\\</span><span class="st">s]+@[^@</span><span class="sc">\\</span><span class="st">s]+</span><span class="sc">\\</span><span class="st">.[^@</span><span class="sc">\\</span><span class="st">s]+$"</span>)),</span>
-<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(messy_data<span class="sc">$</span>Phone_number) <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">str_detect</span>(messy_data<span class="sc">$</span>Phone_number, <span class="st">"^</span><span class="sc">\\</span><span class="st">d{10}$"</span>))</span>
-<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in !is.na(messy_data$Gender) &amp; !(messy_data %in% c("Male", "Female")):
-longer object length is not a multiple of shorter object length</code></pre>
 </div>
+</section>
+<section id="before-and-after" class="level2">
+<h2 class="anchored" data-anchor-id="before-and-after">Before and After</h2>
+<div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cleaning -------------------------------------</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>clean <span class="ot">&lt;-</span> messy_data <span class="sc">|&gt;</span> </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.character), str_squish)) <span class="sc">|&gt;</span> </span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">customer_id =</span> <span class="fu">parse_number</span>(CustomerID),</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">gender =</span> <span class="fu">case_when</span>(</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_to_lower</span>(Gender) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"f"</span>, <span class="st">"female"</span>) <span class="sc">~</span> <span class="st">"Female"</span>,</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_to_lower</span>(Gender) <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"m"</span>, <span class="st">"male"</span>) <span class="sc">~</span> <span class="st">"Male"</span>,</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">if_else</span>(Age <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> Age <span class="sc">&lt;=</span> <span class="dv">100</span>, Age, <span class="cn">NA_real_</span>),</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">signup_date =</span> <span class="fu">suppressWarnings</span>(<span class="fu">dmy</span>(Signup_Date)),</span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">last_purchase_date =</span> <span class="fu">suppressWarnings</span>(<span class="fu">dmy</span>(Last_purchase_date)),</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">purchase_amount_clean =</span> <span class="fu">if_else</span>(purchase_amount <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="fu">as.numeric</span>(purchase_amount), <span class="cn">NA_real_</span>),</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">feedback_score =</span> <span class="fu">if_else</span>(feedback_score <span class="sc">&gt;=</span> <span class="dv">0</span>, feedback_score, <span class="cn">NA_real_</span>),</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">email_valid =</span> <span class="fu">str_detect</span>(email, <span class="st">"^[^@</span><span class="sc">\\</span><span class="st">s]+@[^@</span><span class="sc">\\</span><span class="st">s]+</span><span class="sc">\\</span><span class="st">.[^@</span><span class="sc">\\</span><span class="st">s]+$"</span>),</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">email =</span> <span class="fu">if_else</span>(email_valid, <span class="fu">str_to_lower</span>(email), <span class="cn">NA_character_</span>),</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">phone_valid =</span> <span class="fu">str_detect</span>(Phone_number, <span class="st">"^</span><span class="sc">\\</span><span class="st">d{10}$"</span>),</span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">phone =</span> <span class="fu">if_else</span>(phone_valid, Phone_number, <span class="cn">NA_character_</span>)</span>
-<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(customer_id, <span class="at">name =</span> Name, gender, age, <span class="at">city =</span> City, signup_date, </span>
-<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>         last_purchase_date, purchase_amount_clean, feedback_score, email, phone, <span class="at">country =</span> Country)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>count_status <span class="ot">&lt;-</span> <span class="cf">function</span>(x, is_valid) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  is_miss <span class="ot">&lt;-</span> <span class="fu">is.na</span>(x)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  is_ok <span class="ot">&lt;-</span> <span class="sc">!</span>is_miss <span class="sc">&amp;</span> <span class="fu">coalesce</span>(is_valid, <span class="cn">FALSE</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  is_bad <span class="ot">&lt;-</span> <span class="sc">!</span>is_miss <span class="sc">&amp;</span> <span class="sc">!</span>is_ok</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">valid =</span> <span class="fu">sum</span>(is_ok), <span class="at">missing =</span> <span class="fu">sum</span>(is_miss), <span class="at">invalid =</span> <span class="fu">sum</span>(is_bad))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>before <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>CustomerID, <span class="fu">str_detect</span>(messy_data<span class="sc">$</span>CustomerID, <span class="st">"^C</span><span class="sc">\\</span><span class="st">d+$"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"customer_id"</span>),</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Gender, messy_data<span class="sc">$</span>Gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"gender"</span>),</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Age, messy_data<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> messy_data<span class="sc">$</span>Age <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"age"</span>),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Signup_Date, <span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">dmy</span>(messy_data<span class="sc">$</span>Signup_Date, <span class="at">quiet =</span> <span class="cn">TRUE</span>))) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"signup_date"</span>),</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Last_purchase_date, <span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">dmy</span>(messy_data<span class="sc">$</span>Last_purchase_date, <span class="at">quiet =</span> <span class="cn">TRUE</span>))) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"last_purchase_date"</span>),</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>purchase_amount, <span class="sc">!</span>messy_data<span class="sc">$</span>purchase_amount <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"-999"</span>, <span class="st">"N/A"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"purchase_amount"</span>),</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>feedback_score, messy_data<span class="sc">$</span>feedback_score <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"feedback_score"</span>),</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>email, <span class="fu">str_detect</span>(messy_data<span class="sc">$</span>email, email_pattern)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"email"</span>),</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Phone_number, <span class="fu">str_detect</span>(messy_data<span class="sc">$</span>Phone_number, <span class="st">"^</span><span class="sc">\\</span><span class="st">d{10}$"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"phone"</span>)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">stage =</span> <span class="st">"Before"</span>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>after <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>customer_id, <span class="fu">str_detect</span>(clean_2<span class="sc">$</span>customer_id, <span class="st">"^C</span><span class="sc">\\</span><span class="st">d+$"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"customer_id"</span>),</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>gender, clean_2<span class="sc">$</span>gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"gender"</span>),</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>age, clean_2<span class="sc">$</span>age <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> clean_2<span class="sc">$</span>age <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"age"</span>),</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>signup_date, <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"signup_date"</span>),</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>last_purchase_date, <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"last_purchase_date"</span>),</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>purchase_amount, clean_2<span class="sc">$</span>purchase_amount <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"purchase_amount"</span>),</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>feedback_score, clean_2<span class="sc">$</span>feedback_score <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"feedback_score"</span>),</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>email_cleaned, <span class="fu">str_detect</span>(clean_2<span class="sc">$</span>email_cleaned, email_pattern)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"email"</span>),</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>phone_number, <span class="fu">str_detect</span>(clean_2<span class="sc">$</span>phone_number, <span class="st">"^</span><span class="sc">\\</span><span class="st">d{10}$"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"phone"</span>)</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">stage =</span> <span class="st">"After"</span>)</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>scorecard <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(before, after) <span class="sc">|&gt;</span> </span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(valid, missing, invalid), <span class="at">names_to =</span> <span class="st">"status"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">status =</span> <span class="fu">factor</span>(status, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"invalid"</span>, <span class="st">"missing"</span>, <span class="st">"valid"</span>)),</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>         <span class="at">stage =</span> <span class="fu">factor</span>(stage, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Before"</span>, <span class="st">"After"</span>)))</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="co"># every column and stage must add up to the full row count</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>  scorecard <span class="sc">|&gt;</span> <span class="fu">group_by</span>(stage, column) <span class="sc">|&gt;</span> </span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">total =</span> <span class="fu">sum</span>(n), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pull</span>(total) <span class="sc">|&gt;</span> <span class="fu">unique</span>() <span class="sc">==</span> <span class="fu">nrow</span>(messy_data)</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: There was 1 warning in `mutate()`.
-ℹ In argument: `purchase_amount_clean = if_else(purchase_amount &gt; 0,
-  as.numeric(purchase_amount), NA_real_)`.
-Caused by warning in `if_else()`:
-! NAs introduced by coercion</code></pre>
 </div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>clean_2 <span class="ot">&lt;-</span> messy_data <span class="sc">|&gt;</span> </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># pull the number from customerID and append "C"</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">customer_id =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(CustomerID), <span class="cn">NA_character_</span>, <span class="fu">paste0</span>(<span class="st">"C"</span>,<span class="fu">parse_number</span>(CustomerID))),</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Title capitalisation of names and the title</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">customer_name =</span> <span class="fu">str_to_title</span>(Name),</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># standardize all gender into two Male and Female</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">gender =</span> <span class="fu">case_when</span>(</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>      Gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"female"</span>, <span class="st">"f"</span>) <span class="sc">~</span> <span class="st">"Female"</span>,</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>      Gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"male"</span>, <span class="st">"m"</span>) <span class="sc">~</span> <span class="st">"Male"</span>,</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Age to be between 0 and 100</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">if_else</span>(Age <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">|</span> Age <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="cn">NA_real_</span>, Age),</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Title capitalization to city</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">city =</span> <span class="fu">str_to_title</span>(City), </span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert signup date and last purchase data as proper dates format</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">signup_date =</span> <span class="fu">dmy</span>(Signup_Date, <span class="at">quiet =</span> T),</span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">last_purchase_date =</span> <span class="fu">dmy</span>(Last_purchase_date, <span class="at">quiet =</span> T),</span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># purchase amount to numeric, change N/A and -999 as missing values</span></span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">purchase_amount_clean =</span> <span class="fu">parse_number</span>(<span class="fu">if_else</span>(purchase_amount <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"N/A"</span>, <span class="st">"-999"</span>), <span class="cn">NA_character_</span>, purchase_amount)),</span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># change -1 to NA</span></span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">feedback_score =</span> <span class="fu">if_else</span>(feedback_score <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="cn">NA_real_</span>, feedback_score),</span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># email standardization</span></span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">email_cleaned =</span> <span class="fu">case_when</span>(</span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">is.na</span>(email) <span class="sc">~</span> <span class="cn">NA_character_</span>,</span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_detect</span>(email, <span class="st">"@"</span>) <span class="sc">~</span> email,                              <span class="co"># already valid, leave alone</span></span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_detect</span>(email, <span class="st">"mail</span><span class="sc">\\</span><span class="st">.com$"</span>) <span class="sc">~</span> <span class="fu">str_replace</span>(email, <span class="st">"mail</span><span class="sc">\\</span><span class="st">.com$"</span>, <span class="st">"@mail.com"</span>),  <span class="co"># insert the missing @</span></span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># stanadardize length of phone numbers</span></span>
-<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">phone_number =</span> <span class="fu">if_else</span>(<span class="fu">str_detect</span>(Phone_number, <span class="st">"^</span><span class="sc">\\</span><span class="st">d{10}$"</span>), Phone_number, <span class="cn">NA_character_</span>),</span>
-<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Standardize country</span></span>
-<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">country =</span> <span class="fu">str_squish</span>(Country)</span>
-<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a>  <span class="co"># retain only clean columns</span></span>
-<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(customer_id, customer_name, gender, age, city, signup_date, last_purchase_date, purchase_amount_clean, feedback_score, email_cleaned, phone_number, country) <span class="sc">|&gt;</span> </span>
-<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">purchase_amount =</span> purchase_amount_clean)</span>
-<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- helpers -------------------------------------------------------------</span></span>
-<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a>html_table <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
-<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>  header <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"&lt;th&gt;"</span>, <span class="fu">names</span>(df), <span class="st">"&lt;/th&gt;"</span>, <span class="at">collapse =</span> <span class="st">""</span>)</span>
-<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>  rows <span class="ot">&lt;-</span> <span class="fu">apply</span>(df, <span class="dv">1</span>, <span class="cf">function</span>(r) <span class="fu">paste0</span>(<span class="st">"&lt;td&gt;"</span>, r, <span class="st">"&lt;/td&gt;"</span>, <span class="at">collapse =</span> <span class="st">""</span>))</span>
-<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="st">"&lt;table&gt;&lt;tr&gt;"</span>, header, <span class="st">"&lt;/tr&gt;"</span>,</span>
-<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a>         <span class="fu">paste0</span>(<span class="st">"&lt;tr&gt;"</span>, rows, <span class="st">"&lt;/tr&gt;"</span>, <span class="at">collapse =</span> <span class="st">""</span>), <span class="st">"&lt;/table&gt;"</span>)</span>
-<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a>html_check <span class="ot">&lt;-</span> <span class="cf">function</span>(title, expected, result_html, <span class="at">pass =</span> <span class="cn">NA</span>) {</span>
-<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a>  badge <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
-<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(pass) <span class="sc">~</span> <span class="st">"&lt;span class='badge info'&gt;INFO&lt;/span&gt;"</span>,</span>
-<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a>    pass        <span class="sc">~</span> <span class="st">"&lt;span class='badge pass'&gt;PASS&lt;/span&gt;"</span>,</span>
-<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span>        <span class="sc">~</span> <span class="st">"&lt;span class='badge fail'&gt;FAIL&lt;/span&gt;"</span></span>
-<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="st">"&lt;div class='check'&gt;&lt;h3&gt;"</span>, badge, <span class="st">" "</span>, title, <span class="st">"&lt;/h3&gt;"</span>,</span>
-<span id="cb15-67"><a href="#cb15-67" aria-hidden="true" tabindex="-1"></a>         <span class="st">"&lt;p class='expected'&gt;Expected: "</span>, expected, <span class="st">"&lt;/p&gt;"</span>,</span>
-<span id="cb15-68"><a href="#cb15-68" aria-hidden="true" tabindex="-1"></a>         result_html, <span class="st">"&lt;/div&gt;"</span>)</span>
-<span id="cb15-69"><a href="#cb15-69" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb15-70"><a href="#cb15-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-71"><a href="#cb15-71" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- run the checks ------------------------------------------------------</span></span>
-<span id="cb15-72"><a href="#cb15-72" aria-hidden="true" tabindex="-1"></a>rows_match <span class="ot">&lt;-</span> <span class="fu">nrow</span>(clean_2) <span class="sc">==</span> <span class="fu">nrow</span>(messy_data)</span>
-<span id="cb15-73"><a href="#cb15-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-74"><a href="#cb15-74" aria-hidden="true" tabindex="-1"></a>double_at <span class="ot">&lt;-</span> clean_2 <span class="sc">|&gt;</span></span>
-<span id="cb15-75"><a href="#cb15-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_count</span>(email_cleaned, <span class="st">"@"</span>) <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">nrow</span>()</span>
-<span id="cb15-76"><a href="#cb15-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-77"><a href="#cb15-77" aria-hidden="true" tabindex="-1"></a>country_counts <span class="ot">&lt;-</span> clean_2 <span class="sc">|&gt;</span> <span class="fu">count</span>(country, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb15-78"><a href="#cb15-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">country =</span> <span class="fu">replace_na</span>(country, <span class="st">"(missing)"</span>))</span>
-<span id="cb15-79"><a href="#cb15-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-80"><a href="#cb15-80" aria-hidden="true" tabindex="-1"></a>amount_summary <span class="ot">&lt;-</span> <span class="fu">summary</span>(clean_2<span class="sc">$</span>purchase_amount)</span>
-<span id="cb15-81"><a href="#cb15-81" aria-hidden="true" tabindex="-1"></a>amount_df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">statistic =</span> <span class="fu">names</span>(amount_summary),</span>
-<span id="cb15-82"><a href="#cb15-82" aria-hidden="true" tabindex="-1"></a>                    <span class="at">value =</span> <span class="fu">round</span>(<span class="fu">as.numeric</span>(amount_summary), <span class="dv">2</span>))</span>
-<span id="cb15-83"><a href="#cb15-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-84"><a href="#cb15-84" aria-hidden="true" tabindex="-1"></a>date_check <span class="ot">&lt;-</span> clean_2 <span class="sc">|&gt;</span></span>
-<span id="cb15-85"><a href="#cb15-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(signup_date), <span class="sc">!</span><span class="fu">is.na</span>(last_purchase_date)) <span class="sc">|&gt;</span></span>
-<span id="cb15-86"><a href="#cb15-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">testable_rows =</span> <span class="fu">n</span>(),</span>
-<span id="cb15-87"><a href="#cb15-87" aria-hidden="true" tabindex="-1"></a>            <span class="at">purchase_before_signup =</span> <span class="fu">sum</span>(last_purchase_date <span class="sc">&lt;</span> signup_date),</span>
-<span id="cb15-88"><a href="#cb15-88" aria-hidden="true" tabindex="-1"></a>            <span class="at">pct =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> purchase_before_signup <span class="sc">/</span> testable_rows, <span class="dv">1</span>))</span>
-<span id="cb15-89"><a href="#cb15-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-90"><a href="#cb15-90" aria-hidden="true" tabindex="-1"></a><span class="co"># ---- assemble the HTML ---------------------------------------------------</span></span>
-<span id="cb15-91"><a href="#cb15-91" aria-hidden="true" tabindex="-1"></a>checks <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb15-92"><a href="#cb15-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_check</span>(<span class="st">"Row count preserved"</span>,</span>
-<span id="cb15-93"><a href="#cb15-93" aria-hidden="true" tabindex="-1"></a>             <span class="fu">paste0</span>(<span class="fu">nrow</span>(messy_data), <span class="st">" rows in, same rows out"</span>),</span>
-<span id="cb15-94"><a href="#cb15-94" aria-hidden="true" tabindex="-1"></a>             <span class="fu">paste0</span>(<span class="st">"&lt;p&gt;messy_data: "</span>, <span class="fu">nrow</span>(messy_data),</span>
-<span id="cb15-95"><a href="#cb15-95" aria-hidden="true" tabindex="-1"></a>                    <span class="st">" | clean_2: "</span>, <span class="fu">nrow</span>(clean_2), <span class="st">"&lt;/p&gt;"</span>),</span>
-<span id="cb15-96"><a href="#cb15-96" aria-hidden="true" tabindex="-1"></a>             <span class="at">pass =</span> rows_match),</span>
-<span id="cb15-97"><a href="#cb15-97" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb15-98"><a href="#cb15-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_check</span>(<span class="st">"No double @ in emails"</span>, <span class="st">"0 rows"</span>,</span>
-<span id="cb15-99"><a href="#cb15-99" aria-hidden="true" tabindex="-1"></a>             <span class="fu">paste0</span>(<span class="st">"&lt;p&gt;"</span>, double_at, <span class="st">" rows found&lt;/p&gt;"</span>),</span>
-<span id="cb15-100"><a href="#cb15-100" aria-hidden="true" tabindex="-1"></a>             <span class="at">pass =</span> double_at <span class="sc">==</span> <span class="dv">0</span>),</span>
-<span id="cb15-101"><a href="#cb15-101" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb15-102"><a href="#cb15-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_check</span>(<span class="st">"Country values"</span>, <span class="st">"USA and UK still uppercase"</span>,</span>
-<span id="cb15-103"><a href="#cb15-103" aria-hidden="true" tabindex="-1"></a>             <span class="fu">html_table</span>(country_counts),</span>
-<span id="cb15-104"><a href="#cb15-104" aria-hidden="true" tabindex="-1"></a>             <span class="at">pass =</span> <span class="fu">all</span>(<span class="fu">c</span>(<span class="st">"USA"</span>, <span class="st">"UK"</span>) <span class="sc">%in%</span> country_counts<span class="sc">$</span>country)),</span>
-<span id="cb15-105"><a href="#cb15-105" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb15-106"><a href="#cb15-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_check</span>(<span class="st">"purchase_amount is numeric, no -999"</span>,</span>
-<span id="cb15-107"><a href="#cb15-107" aria-hidden="true" tabindex="-1"></a>             <span class="st">"class numeric, minimum above 0"</span>,</span>
-<span id="cb15-108"><a href="#cb15-108" aria-hidden="true" tabindex="-1"></a>             <span class="fu">paste0</span>(<span class="st">"&lt;p&gt;class: "</span>, <span class="fu">class</span>(clean_2<span class="sc">$</span>purchase_amount)[<span class="dv">1</span>], <span class="st">"&lt;/p&gt;"</span>,</span>
-<span id="cb15-109"><a href="#cb15-109" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">html_table</span>(amount_df)),</span>
-<span id="cb15-110"><a href="#cb15-110" aria-hidden="true" tabindex="-1"></a>             <span class="at">pass =</span> <span class="fu">is.numeric</span>(clean_2<span class="sc">$</span>purchase_amount) <span class="sc">&amp;&amp;</span></span>
-<span id="cb15-111"><a href="#cb15-111" aria-hidden="true" tabindex="-1"></a>               <span class="fu">all</span>(clean_2<span class="sc">$</span>purchase_amount <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
-<span id="cb15-112"><a href="#cb15-112" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb15-113"><a href="#cb15-113" aria-hidden="true" tabindex="-1"></a>  <span class="fu">html_check</span>(<span class="st">"Purchase dated before signup"</span>,</span>
-<span id="cb15-114"><a href="#cb15-114" aria-hidden="true" tabindex="-1"></a>             <span class="st">"a data finding, not a cleaning error (flagged, rows kept)"</span>,</span>
-<span id="cb15-115"><a href="#cb15-115" aria-hidden="true" tabindex="-1"></a>             <span class="fu">html_table</span>(date_check))</span>
-<span id="cb15-116"><a href="#cb15-116" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-117"><a href="#cb15-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-118"><a href="#cb15-118" aria-hidden="true" tabindex="-1"></a>css <span class="ot">&lt;-</span> <span class="st">"</span></span>
-<span id="cb15-119"><a href="#cb15-119" aria-hidden="true" tabindex="-1"></a><span class="st">body{font-family:system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;color:#222}</span></span>
-<span id="cb15-120"><a href="#cb15-120" aria-hidden="true" tabindex="-1"></a><span class="st">.check{border:1px solid #ddd;border-radius:8px;padding:1rem;margin:1rem 0}</span></span>
-<span id="cb15-121"><a href="#cb15-121" aria-hidden="true" tabindex="-1"></a><span class="st">h3{margin:0 0 .5rem}</span></span>
-<span id="cb15-122"><a href="#cb15-122" aria-hidden="true" tabindex="-1"></a><span class="st">.expected{color:#666;margin:.25rem 0 .75rem}</span></span>
-<span id="cb15-123"><a href="#cb15-123" aria-hidden="true" tabindex="-1"></a><span class="st">table{border-collapse:collapse}</span></span>
-<span id="cb15-124"><a href="#cb15-124" aria-hidden="true" tabindex="-1"></a><span class="st">th,td{border:1px solid #ccc;padding:4px 10px;text-align:left}</span></span>
-<span id="cb15-125"><a href="#cb15-125" aria-hidden="true" tabindex="-1"></a><span class="st">th{background:#f4f4f4}</span></span>
-<span id="cb15-126"><a href="#cb15-126" aria-hidden="true" tabindex="-1"></a><span class="st">.badge{padding:2px 8px;border-radius:4px;color:#fff;font-size:.8rem}</span></span>
-<span id="cb15-127"><a href="#cb15-127" aria-hidden="true" tabindex="-1"></a><span class="st">.pass{background:#2e7d32}.fail{background:#c62828}.info{background:#1565c0}</span></span>
-<span id="cb15-128"><a href="#cb15-128" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
-<span id="cb15-129"><a href="#cb15-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-130"><a href="#cb15-130" aria-hidden="true" tabindex="-1"></a>out_file <span class="ot">&lt;-</span> <span class="st">"validation_report.html"</span></span>
-<span id="cb15-131"><a href="#cb15-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-132"><a href="#cb15-132" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(</span>
-<span id="cb15-133"><a href="#cb15-133" aria-hidden="true" tabindex="-1"></a>  <span class="st">"&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset='utf-8'&gt;"</span>,</span>
-<span id="cb15-134"><a href="#cb15-134" aria-hidden="true" tabindex="-1"></a>  <span class="st">"&lt;title&gt;Data cleaning validation&lt;/title&gt;"</span>,</span>
-<span id="cb15-135"><a href="#cb15-135" aria-hidden="true" tabindex="-1"></a>  <span class="st">"&lt;style&gt;"</span>, css, <span class="st">"&lt;/style&gt;&lt;/head&gt;&lt;body&gt;"</span>,</span>
-<span id="cb15-136"><a href="#cb15-136" aria-hidden="true" tabindex="-1"></a>  <span class="st">"&lt;h1&gt;Data cleaning validation report&lt;/h1&gt;"</span>,</span>
-<span id="cb15-137"><a href="#cb15-137" aria-hidden="true" tabindex="-1"></a>  <span class="st">"&lt;p&gt;Generated: "</span>, <span class="fu">format</span>(<span class="fu">Sys.time</span>(), <span class="st">"%Y-%m-%d %H:%M"</span>), <span class="st">"&lt;/p&gt;"</span>,</span>
-<span id="cb15-138"><a href="#cb15-138" aria-hidden="true" tabindex="-1"></a>  checks,</span>
-<span id="cb15-139"><a href="#cb15-139" aria-hidden="true" tabindex="-1"></a>  <span class="st">"&lt;/body&gt;&lt;/html&gt;"</span>,</span>
-<span id="cb15-140"><a href="#cb15-140" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> out_file, <span class="at">sep =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span></span>
-<span id="cb15-141"><a href="#cb15-141" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb15-142"><a href="#cb15-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-143"><a href="#cb15-143" aria-hidden="true" tabindex="-1"></a><span class="fu">browseURL</span>(out_file)</span>
-<span id="cb15-144"><a href="#cb15-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-145"><a href="#cb15-145" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-146"><a href="#cb15-146" aria-hidden="true" tabindex="-1"></a><span class="co"># Check </span></span>
-<span id="cb15-147"><a href="#cb15-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-148"><a href="#cb15-148" aria-hidden="true" tabindex="-1"></a>count_status <span class="ot">&lt;-</span> <span class="cf">function</span>(x, is_valid) {</span>
-<span id="cb15-149"><a href="#cb15-149" aria-hidden="true" tabindex="-1"></a>  is_miss  <span class="ot">&lt;-</span> <span class="fu">is.na</span>(x)</span>
-<span id="cb15-150"><a href="#cb15-150" aria-hidden="true" tabindex="-1"></a>  is_ok    <span class="ot">&lt;-</span> <span class="sc">!</span>is_miss <span class="sc">&amp;</span> <span class="fu">coalesce</span>(is_valid, <span class="cn">FALSE</span>)</span>
-<span id="cb15-151"><a href="#cb15-151" aria-hidden="true" tabindex="-1"></a>  is_bad   <span class="ot">&lt;-</span> <span class="sc">!</span>is_miss <span class="sc">&amp;</span> <span class="sc">!</span>is_ok</span>
-<span id="cb15-152"><a href="#cb15-152" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">valid =</span> <span class="fu">sum</span>(is_ok), <span class="at">missing =</span> <span class="fu">sum</span>(is_miss), <span class="at">invalid =</span> <span class="fu">sum</span>(is_bad))</span>
-<span id="cb15-153"><a href="#cb15-153" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb15-154"><a href="#cb15-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-155"><a href="#cb15-155" aria-hidden="true" tabindex="-1"></a>email_ok <span class="ot">&lt;-</span> <span class="st">"^[^@</span><span class="sc">\\</span><span class="st">s]+@[^@</span><span class="sc">\\</span><span class="st">s]+</span><span class="sc">\\</span><span class="st">.[^@</span><span class="sc">\\</span><span class="st">s]+$"</span></span>
-<span id="cb15-156"><a href="#cb15-156" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-157"><a href="#cb15-157" aria-hidden="true" tabindex="-1"></a>before <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb15-158"><a href="#cb15-158" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>CustomerID, <span class="fu">str_detect</span>(messy_data<span class="sc">$</span>CustomerID, <span class="st">"^C</span><span class="sc">\\</span><span class="st">d+$"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"customer_id"</span>),</span>
-<span id="cb15-159"><a href="#cb15-159" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Gender, messy_data<span class="sc">$</span>Gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"gender"</span>),</span>
-<span id="cb15-160"><a href="#cb15-160" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Age, messy_data<span class="sc">$</span>Age <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> messy_data<span class="sc">$</span>Age <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"age"</span>),</span>
-<span id="cb15-161"><a href="#cb15-161" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Signup_Date, <span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">dmy</span>(messy_data<span class="sc">$</span>Signup_Date, <span class="at">quiet =</span> <span class="cn">TRUE</span>))) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"signup_date"</span>),</span>
-<span id="cb15-162"><a href="#cb15-162" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Last_purchase_date, <span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">dmy</span>(messy_data<span class="sc">$</span>Last_purchase_date, <span class="at">quiet =</span> <span class="cn">TRUE</span>))) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"last_purchase_date"</span>),</span>
-<span id="cb15-163"><a href="#cb15-163" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>purchase_amount, <span class="sc">!</span>messy_data<span class="sc">$</span>purchase_amount <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"-999"</span>, <span class="st">"N/A"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"purchase_amount"</span>),</span>
-<span id="cb15-164"><a href="#cb15-164" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>feedback_score, messy_data<span class="sc">$</span>feedback_score <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"feedback_score"</span>),</span>
-<span id="cb15-165"><a href="#cb15-165" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>email, <span class="fu">str_detect</span>(messy_data<span class="sc">$</span>email, email_ok)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"email"</span>),</span>
-<span id="cb15-166"><a href="#cb15-166" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(messy_data<span class="sc">$</span>Phone_number, <span class="fu">str_detect</span>(messy_data<span class="sc">$</span>Phone_number, <span class="st">"^</span><span class="sc">\\</span><span class="st">d{10}$"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"phone"</span>)</span>
-<span id="cb15-167"><a href="#cb15-167" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">stage =</span> <span class="st">"Before"</span>)</span>
-<span id="cb15-168"><a href="#cb15-168" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-169"><a href="#cb15-169" aria-hidden="true" tabindex="-1"></a>after <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb15-170"><a href="#cb15-170" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>customer_id, <span class="fu">str_detect</span>(clean_2<span class="sc">$</span>customer_id, <span class="st">"^C</span><span class="sc">\\</span><span class="st">d+$"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"customer_id"</span>),</span>
-<span id="cb15-171"><a href="#cb15-171" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>gender, clean_2<span class="sc">$</span>gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"gender"</span>),</span>
-<span id="cb15-172"><a href="#cb15-172" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>age, clean_2<span class="sc">$</span>age <span class="sc">&gt;=</span> <span class="dv">0</span> <span class="sc">&amp;</span> clean_2<span class="sc">$</span>age <span class="sc">&lt;=</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"age"</span>),</span>
-<span id="cb15-173"><a href="#cb15-173" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>signup_date, <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"signup_date"</span>),</span>
-<span id="cb15-174"><a href="#cb15-174" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>last_purchase_date, <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"last_purchase_date"</span>),</span>
-<span id="cb15-175"><a href="#cb15-175" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>purchase_amount, clean_2<span class="sc">$</span>purchase_amount <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"purchase_amount"</span>),</span>
-<span id="cb15-176"><a href="#cb15-176" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>feedback_score, clean_2<span class="sc">$</span>feedback_score <span class="sc">&gt;=</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"feedback_score"</span>),</span>
-<span id="cb15-177"><a href="#cb15-177" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>email_cleaned, <span class="fu">str_detect</span>(clean_2<span class="sc">$</span>email_cleaned, email_ok)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"email"</span>),</span>
-<span id="cb15-178"><a href="#cb15-178" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count_status</span>(clean_2<span class="sc">$</span>phone_number, <span class="fu">str_detect</span>(clean_2<span class="sc">$</span>phone_number, <span class="st">"^</span><span class="sc">\\</span><span class="st">d{10}$"</span>)) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">column =</span> <span class="st">"phone"</span>)</span>
-<span id="cb15-179"><a href="#cb15-179" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">stage =</span> <span class="st">"After"</span>)</span>
-<span id="cb15-180"><a href="#cb15-180" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-181"><a href="#cb15-181" aria-hidden="true" tabindex="-1"></a>scorecard <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(before, after) <span class="sc">|&gt;</span></span>
-<span id="cb15-182"><a href="#cb15-182" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(valid, missing, invalid), <span class="at">names_to =</span> <span class="st">"status"</span>, <span class="at">values_to =</span> <span class="st">"n"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb15-183"><a href="#cb15-183" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">status =</span> <span class="fu">factor</span>(status, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"invalid"</span>, <span class="st">"missing"</span>, <span class="st">"valid"</span>)),</span>
-<span id="cb15-184"><a href="#cb15-184" aria-hidden="true" tabindex="-1"></a>         <span class="at">stage  =</span> <span class="fu">factor</span>(stage, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Before"</span>, <span class="st">"After"</span>)))</span>
-<span id="cb15-185"><a href="#cb15-185" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-186"><a href="#cb15-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-187"><a href="#cb15-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-188"><a href="#cb15-188" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> scorecard <span class="sc">|&gt;</span></span>
-<span id="cb15-189"><a href="#cb15-189" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(stage, n, <span class="at">fill =</span> status)) <span class="sc">+</span></span>
-<span id="cb15-190"><a href="#cb15-190" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb15-191"><a href="#cb15-191" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
-<span id="cb15-192"><a href="#cb15-192" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">if_else</span>(n <span class="sc">&gt;</span> <span class="dv">0</span>, scales<span class="sc">::</span><span class="fu">comma</span>(n), <span class="st">""</span>)),</span>
-<span id="cb15-193"><a href="#cb15-193" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>),</span>
-<span id="cb15-194"><a href="#cb15-194" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">3</span>, <span class="at">colour =</span> <span class="st">"white"</span></span>
-<span id="cb15-195"><a href="#cb15-195" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb15-196"><a href="#cb15-196" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>column, <span class="at">ncol =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb15-197"><a href="#cb15-197" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">valid =</span> <span class="st">"#2e7d32"</span>, <span class="at">missing =</span> <span class="st">"#757575"</span>, <span class="at">invalid =</span> <span class="st">"#c62828"</span>)) <span class="sc">+</span></span>
-<span id="cb15-198"><a href="#cb15-198" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Data quality before vs after cleaning"</span>, <span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Rows"</span>, <span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb15-199"><a href="#cb15-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb15-200"><a href="#cb15-200" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
-<span id="cb15-201"><a href="#cb15-201" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-202"><a href="#cb15-202" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="st">"before_after.png"</span>, p, <span class="at">width =</span> <span class="dv">10</span>, <span class="at">height =</span> <span class="dv">8</span>, <span class="at">dpi =</span> <span class="dv">150</span>)</span>
-<span id="cb15-203"><a href="#cb15-203" aria-hidden="true" tabindex="-1"></a>p</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="index_files/figure-html/scorecard-plot-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>Cleaning turns invalid values into missing ones, so “missing” goes up while “invalid” drops to zero. That is deliberate: missing value is honest, a guess one is not.</p>
+</section>
+<section id="findings" class="level2">
+<h2 class="anchored" data-anchor-id="findings">Findings</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>amount_missing <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(clean_2<span class="sc">$</span>purchase_amount))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>date_check <span class="ot">&lt;-</span> clean_2 <span class="sc">|&gt;</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(signup_date), <span class="sc">!</span><span class="fu">is.na</span>(last_purchase_date)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">testable =</span> <span class="fu">n</span>(),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">before_signup =</span> <span class="fu">sum</span>(last_purchase_date <span class="sc">&lt;</span> signup_date),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">pct =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> before_signup <span class="sc">/</span> testable, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<ul>
+<li><p><strong>Purchase amounts are mostly likely missing:</strong> 75% of rows have no usable amount, so any average spend rests on a minority of customers.</p></li>
+<li><p><strong>Dates don’t add up:</strong> among the 1,684 rows with both dates, 829 (49.2%) show a last purchase <em>before</em> signup. I flagged this and kept the rows. The cause is unknown (entry errors, migrated accounts or swapped fields).</p></li>
+<li><p><strong>City and country don’t match:</strong> every city is in India, but countries includes USA, UK, Canada and Australia.</p></li>
+</ul>
+</section>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
+<ul>
+<li>Only about 17% of rows have both dates, so the date finding rests on a small subset.</li>
+<li>The rules reflect my assumptions about placeholders and formats, listed above.</li>
+<li>The dataset looks synthetic, so findings illustrate the method and not real customers.</li>
+</ul>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
