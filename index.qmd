@@ -4,7 +4,6 @@ subtitle: "A before/after data-quality case study in R"
 ---
 
 ```{r}
-
 #| label: setup
 #| include: false
 #| message: false
@@ -28,6 +27,7 @@ The goal: clean it without inventing any values, and measure the improvement col
 glimpse(messy_data)
 ```
 Problems found
+
 - **CustomerID:** mixed format (`C2` vs `3`)
 - **Gender:** `F`, `Female`, `female`, `male`, `Male`
 - **Age:** impossible values (`-5`, `200`)
@@ -88,6 +88,7 @@ clean_2 <- messy_data |>
   rename(purchase_amount = purchase_amount_clean)
 ```
 ### Assumptions
+
 - Invalid values become `NA`. Nothing is guessed or filled in, and no rows are dropped.
 - `-1` in `feedback_score` is treated as "no answer". Scores of `10` are kept as valid, although the rest of the scale looks like 1 to 5.
 - A broken email is assumed to be missing only the '@' before `mail.com`
@@ -216,12 +217,14 @@ date_check <- clean_2 |>
             pct = round(100 * before_signup / testable, 1))
 
 ```
+
 - **Purchase amounts are mostly likely missing:** `r scales::percent(amount_missing, accuracy = 1)` of rows have no usable amount, so any average spend rests on a minority of customers.
 
 - **Dates don't add up:** among the `r scales::comma(date_check$testable)` rows with both dates, `r scales::comma(date_check$before_signup)` (`r date_check$pct`%) show a last purchase *before* signup. I flagged this and kept the rows. The cause is unknown (entry errors, migrated accounts or swapped fields).
 - **City and country don't match:** every city is in India, but countries includes USA, UK, Canada and Australia.
 
 ## Limitations
+
 - Only about 17% of rows have both dates, so the date finding rests on a small subset.
 - The rules reflect my assumptions about placeholders and formats, listed above.
 - The dataset looks synthetic, so findings illustrate the method and not real customers.
