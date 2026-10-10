@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'>
+<title>Data cleaning validation</title>
+<style>
+
+body{font-family:system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;color:#222}
+.check{border:1px solid #ddd;border-radius:8px;padding:1rem;margin:1rem 0}
+h3{margin:0 0 .5rem}
+.expected{color:#666;margin:.25rem 0 .75rem}
+table{border-collapse:collapse}
+th,td{border:1px solid #ccc;padding:4px 10px;text-align:left}
+th{background:#f4f4f4}
+.badge{padding:2px 8px;border-radius:4px;color:#fff;font-size:.8rem}
+.pass{background:#2e7d32}.fail{background:#c62828}.info{background:#1565c0}
+
+</style></head><body>
+<h1>Data cleaning validation report</h1>
+<p>Generated: 
+2026-10-10 19:02
+</p>
+<div class='check'><h3><span class='badge pass'>PASS</span> Row count preserved</h3><p class='expected'>Expected: 10000 rows in, same rows out</p><p>messy_data: 10000 | clean_2: 10000</p></div>
+<div class='check'><h3><span class='badge pass'>PASS</span> No double @ in emails</h3><p class='expected'>Expected: 0 rows</p><p>0 rows found</p></div>
+<div class='check'><h3><span class='badge pass'>PASS</span> Country values</h3><p class='expected'>Expected: USA and UK still uppercase</p><table><tr><th>country</th><th>n</th></tr><tr><td>(missing)</td><td>1704</td></tr><tr><td>USA</td><td>1679</td></tr><tr><td>Australia</td><td>1660</td></tr><tr><td>Canada</td><td>1658</td></tr><tr><td>UK</td><td>1658</td></tr><tr><td>India</td><td>1641</td></tr></table></div>
+<div class='check'><h3><span class='badge pass'>PASS</span> purchase_amount is numeric, no -999</h3><p class='expected'>Expected: class numeric, minimum above 0</p><p>class: numeric</p><table><tr><th>statistic</th><th>value</th></tr><tr><td>Min.</td><td>  10.31</td></tr><tr><td>1st Qu.</td><td>1159.38</td></tr><tr><td>Median</td><td>2460.36</td></tr><tr><td>Mean</td><td>2450.62</td></tr><tr><td>3rd Qu.</td><td>3733.88</td></tr><tr><td>Max.</td><td>4998.67</td></tr><tr><td>NA's</td><td>7534.00</td></tr></table></div>
+<div class='check'><h3><span class='badge info'>INFO</span> Purchase dated before signup</h3><p class='expected'>Expected: a data finding, not a cleaning error (flagged, rows kept)</p><table><tr><th>testable_rows</th><th>purchase_before_signup</th><th>pct</th></tr><tr><td>1684</td><td>829</td><td>49.2</td></tr></table></div>
+</body></html>
