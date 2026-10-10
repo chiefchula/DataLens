@@ -11,6 +11,7 @@ subtitle: "A before/after data-quality case study in R"
 #| warning: false
 
 library(tidyverse)
+
 knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 
 messy_data <- read_csv("data/messy/messy_customer_data.csv")
