@@ -1,0 +1,12 @@
+project:
+  type: website
+  output-dir: docs
+  
+website:
+  title: "Messy Customer Data: Cleaning Case Study"
+  
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
