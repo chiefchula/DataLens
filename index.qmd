@@ -4,14 +4,14 @@ subtitle: "A before/after data-quality case study in R"
 ---
 
 
-
+```{r}
 # clean workspace --------------------------------------------------------------
 rm(list = ls())
 
 # attach required packages -----------------------------------------------------
 pacman::p_load(tidyverse, janitor, skimr)
 
-messy_data <- read_csv("data/messy_customer_data.csv")
+messy_data <- read_csv("data/messy/messy_customer_data.csv")
 
 glimpse(messy_data)
 summary(messy_data)
@@ -274,3 +274,4 @@ p <- scorecard |>
 
 ggsave("before_after.png", p, width = 10, height = 8, dpi = 150)
 p
+```
