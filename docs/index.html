@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Cleaning 10,000 messy customer records – Messy Customer Data: Cleaning Case Study</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-a0f9fd0d421825b736dc1bbcbcba2219.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#clean-workspace" id="toc-clean-workspace" class="nav-link active" data-scroll-target="#clean-workspace">clean workspace ————————————————————–</a></li>
+  <li><a href="#attach-required-packages" id="toc-attach-required-packages" class="nav-link" data-scroll-target="#attach-required-packages">attach required packages —————————————————–</a></li>
+  <li><a href="#dataset-assessment-scorecard" id="toc-dataset-assessment-scorecard" class="nav-link" data-scroll-target="#dataset-assessment-scorecard">Dataset assessment scorecard ————————————————</a></li>
+  <li><a href="#cleaning--" id="toc-cleaning--" class="nav-link" data-scroll-target="#cleaning--">Cleaning ————————————-</a></li>
+  <li><a href="#helpers--" id="toc-helpers--" class="nav-link" data-scroll-target="#helpers--">—- helpers ————————————————————-</a></li>
+  <li><a href="#run-the-checks" id="toc-run-the-checks" class="nav-link" data-scroll-target="#run-the-checks">—- run the checks ——————————————————</a></li>
+  <li><a href="#assemble-the-html" id="toc-assemble-the-html" class="nav-link" data-scroll-target="#assemble-the-html">—- assemble the HTML —————————————————</a></li>
+  <li><a href="#check" id="toc-check" class="nav-link" data-scroll-target="#check">Check</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Cleaning 10,000 messy customer records</h1>
+<p class="subtitle lead">A before/after data-quality case study in R</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="clean-workspace" class="level1">
+<h1>clean workspace ————————————————————–</h1>
+<p>rm(list = ls())</p>
+</section>
+<section id="attach-required-packages" class="level1">
+<h1>attach required packages —————————————————–</h1>
+<p>pacman::p_load(tidyverse, janitor, skimr)</p>
+<p>messy_data &lt;- read_csv(“data/messy_customer_data.csv”)</p>
+<p>glimpse(messy_data) summary(messy_data) colSums(is.na(messy_data)) sum(duplicated((messy_data)))</p>
+</section>
+<section id="dataset-assessment-scorecard" class="level1">
+<h1>Dataset assessment scorecard ————————————————</h1>
+<p>invalid_counts &lt;- tibble( column = c(“CustomerID”, “Gender”, “Age”, “Signup_Date”, “Last_purchase_date”, “purchase_amount”, “email”, “Phone_number”, “Country”), missing = c( sum(is.na(messy_data<span class="math inline">\(CustomerID)),
+    sum(is.na(messy_data\)</span>Gender)), sum(is.na(messy_data<span class="math inline">\(Age)),
+    sum(is.na(messy_data\)</span>Signup_Date)), sum(is.na(messy_data<span class="math inline">\(Last_purchase_date)),
+    sum(is.na(messy_data\)</span>purchase_amount)), # sum(is.na(messy_data<span class="math inline">\(feedback_score)),
+    sum(is.na(messy_data\)</span>email)), sum(is.na(messy_data<span class="math inline">\(Phone_number)),
+    sum(is.na(messy_data\)</span>Country)) ), invalid = c( 0, sum(!is.na(messy_data<span class="math inline">\(Gender) &amp; !(messy_data %in% c("Male","Female"))),
+    sum(messy_data\)</span>Age &lt; 0 | messy_data<span class="math inline">\(Age &gt; 100, na.rm = TRUE),
+    sum(is.na(messy_data\)</span>Signup_Date) &amp; is.na(suppressWarnings(dmy(messy_data<span class="math inline">\(Signup_Date)))),
+    sum(is.na(messy_data\)</span>Last_purchase_date) &amp; is.na(suppressWarnings(dmy(messy_data<span class="math inline">\(Last_purchase_date)))),
+    sum(messy_data\)</span>purchase_amount %in% c(“-999”, “N/A”)), sum(messy_data<span class="math inline">\(feedback_score == -1, na.rm = TRUE),
+    sum(!is.na(messy_data\)</span>email) &amp; !str_detect(messy_data<span class="math inline">\(email, "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+\)</span>“)), sum(!is.na(messy_data<span class="math inline">\(Phone_number) &amp; !str_detect(messy_data\)</span>Phone_number,”^\d{10}$“)) ) )</p>
+</section>
+<section id="cleaning--" class="level1">
+<h1>Cleaning ————————————-</h1>
+<p>clean &lt;- messy_data |&gt; mutate(across(where(is.character), str_squish)) |&gt; mutate( customer_id = parse_number(CustomerID), gender = case_when( str_to_lower(Gender) %in% c(“f”, “female”) ~ “Female”, str_to_lower(Gender) %in% c(“m”, “male”) ~ “Male”, TRUE ~ NA_character_ ), age = if_else(Age &gt;= 0 &amp; Age &lt;= 100, Age, NA_real_), signup_date = suppressWarnings(dmy(Signup_Date)), last_purchase_date = suppressWarnings(dmy(Last_purchase_date)), purchase_amount_clean = if_else(purchase_amount &gt; 0, as.numeric(purchase_amount), NA_real_), feedback_score = if_else(feedback_score &gt;= 0, feedback_score, NA_real_), email_valid = str_detect(email, “<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>+@[^@\\s]+\.[^@\\s]+<span class="math inline">\("),
+    email = if_else(email_valid, str_to_lower(email), NA_character_),
+    phone_valid = str_detect(Phone_number, "^\\d{10}\)</span>”), phone = if_else(phone_valid, Phone_number, NA_character_) ) |&gt; select(customer_id, name = Name, gender, age, city = City, signup_date, last_purchase_date, purchase_amount_clean, feedback_score, email, phone, country = Country)</p>
+<p>clean_2 &lt;- messy_data |&gt; mutate( # pull the number from customerID and append “C” customer_id = if_else(is.na(CustomerID), NA_character_, paste0(“C”,parse_number(CustomerID))),</p>
+<pre><code># Title capitalisation of names and the title
+customer_name = str_to_title(Name),
+
+# standardize all gender into two Male and Female
+gender = case_when(
+  Gender %in% c("female", "f") ~ "Female",
+  Gender %in% c("male", "m") ~ "Male",
+  TRUE ~ NA_character_
+),
+
+# Age to be between 0 and 100
+age = if_else(Age &lt; 0 | Age &gt; 100, NA_real_, Age),
+
+# Title capitalization to city
+city = str_to_title(City), 
+
+# Convert signup date and last purchase data as proper dates format
+signup_date = dmy(Signup_Date, quiet = T),
+last_purchase_date = dmy(Last_purchase_date, quiet = T),
+
+# purchase amount to numeric, change N/A and -999 as missing values
+purchase_amount_clean = parse_number(if_else(purchase_amount %in% c("N/A", "-999"), NA_character_, purchase_amount)),
+
+# change -1 to NA
+feedback_score = if_else(feedback_score &lt; 0, NA_real_, feedback_score),
+
+# email standardization
+email_cleaned = case_when(
+  is.na(email) ~ NA_character_,
+  str_detect(email, "@") ~ email,                              # already valid, leave alone
+  str_detect(email, "mail\\.com$") ~ str_replace(email, "mail\\.com$", "@mail.com"),  # insert the missing @
+  TRUE ~ NA_character_
+),
+
+# stanadardize length of phone numbers
+phone_number = if_else(str_detect(Phone_number, "^\\d{10}$"), Phone_number, NA_character_),
+
+# Standardize country
+country = str_squish(Country)</code></pre>
+<p>) |&gt;</p>
+<p># retain only clean columns select(customer_id, customer_name, gender, age, city, signup_date, last_purchase_date, purchase_amount_clean, feedback_score, email_cleaned, phone_number, country) |&gt; rename(purchase_amount = purchase_amount_clean)</p>
+</section>
+<section id="helpers--" class="level1">
+<h1>—- helpers ————————————————————-</h1>
+html_table &lt;- function(df) { header &lt;- paste0(“
+
+“, names(df),”
+
+“, collapse =”“) rows &lt;- apply(df, 1, function(r) paste0(”
+
+“, r,”
+
+“, collapse =”“)) paste0(”
+
+“, header,”
+
+“, paste0(”
+
+“, rows,”
+
+“, collapse =”“),”
+<table>
+<tbody><tr></tr><tr></tr></tbody></table>
+<p>“) }</p>
+html_check &lt;- function(title, expected, result_html, pass = NA) { badge &lt;- case_when( is.na(pass) ~ “<span class="badge info">INFO</span>”, pass ~ “<span class="badge pass">PASS</span>”, TRUE ~ “<span class="badge fail">FAIL</span>” ) paste0(“
+<div class="check">
+<h3 class="anchored" data-anchor-id="helpers--">
+“, badge,” “, title,”
+</h3>
+“,”
+<p class="expected">
+Expected: “, expected,”
+</p>
+“, result_html,”
+</div>
+<p>“) }</p>
+</section>
+<section id="run-the-checks" class="level1">
+<h1>—- run the checks ——————————————————</h1>
+<p>rows_match &lt;- nrow(clean_2) == nrow(messy_data)</p>
+<p>double_at &lt;- clean_2 |&gt; filter(str_count(email_cleaned, “@”) &gt; 1) |&gt; nrow()</p>
+<p>country_counts &lt;- clean_2 |&gt; count(country, sort = TRUE) |&gt; mutate(country = replace_na(country, “(missing)”))</p>
+<p>amount_summary &lt;- summary(clean_2$purchase_amount) amount_df &lt;- tibble(statistic = names(amount_summary), value = round(as.numeric(amount_summary), 2))</p>
+<p>date_check &lt;- clean_2 |&gt; filter(!is.na(signup_date), !is.na(last_purchase_date)) |&gt; summarise(testable_rows = n(), purchase_before_signup = sum(last_purchase_date &lt; signup_date), pct = round(100 * purchase_before_signup / testable_rows, 1))</p>
+</section>
+<section id="assemble-the-html" class="level1">
+<h1>—- assemble the HTML —————————————————</h1>
+checks &lt;- c( html_check(“Row count preserved”, paste0(nrow(messy_data), ” rows in, same rows out”), paste0(“
+<p>
+messy_data: “, nrow(messy_data),” | clean_2: “, nrow(clean_2),”
+</p>
+<p>“), pass = rows_match),</p>
+html_check(“No double @ in emails”, “0 rows”, paste0(“
+<p>
+“, double_at,” rows found
+</p>
+<p>“), pass = double_at == 0),</p>
+<p>html_check(“Country values”, “USA and UK still uppercase”, html_table(country_counts), pass = all(c(“USA”, “UK”) %in% country_counts$country)),</p>
+html_check(“purchase_amount is numeric, no -999”, “class numeric, minimum above 0”, paste0(“
+<p>
+</p><p>class: “, class(clean_2<span class="math inline">\(purchase_amount)[1], "&lt;/p&gt;",
+                    html_table(amount_df)),
+             pass = is.numeric(clean_2\)</span>purchase_amount) &amp;&amp; all(clean_2$purchase_amount &gt; 0, na.rm = TRUE)),</p>
+<p>html_check(“Purchase dated before signup”, “a data finding, not a cleaning error (flagged, rows kept)”, html_table(date_check)) )</p>
+<p>css &lt;- ” body{font-family:system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;color:#222} .check{border:1px solid #ddd;border-radius:8px;padding:1rem;margin:1rem 0} h3{margin:0 0 .5rem} .expected{color:#666;margin:.25rem 0 .75rem} table{border-collapse:collapse} th,td{border:1px solid #ccc;padding:4px 10px;text-align:left} th{background:#f4f4f4} .badge{padding:2px 8px;border-radius:4px;color:#fff;font-size:.8rem} .pass{background:#2e7d32}.fail{background:#c62828}.info{background:#1565c0} ”</p>
+<p>out_file &lt;- “validation_report.html”</p>
+cat( “&lt;!DOCTYPE html&gt;
+
+
+<meta charset="utf-8">
+“,”
+<title>
+Data cleaning validation
+</title>
+“,”<style>“, css,”</style>
+
+
+“,”
+<h1>
+Data cleaning validation report
+</h1>
+“,”
+<p>
+Generated: “, format(Sys.time(),”%Y-%m-%d %H:%M”), “
+</p>
+“, checks,”
+
+
+<p>“, file = out_file, sep =”” )</p>
+<p>browseURL(out_file)</p>
+</section>
+<section id="check" class="level1">
+<h1>Check</h1>
+<p>count_status &lt;- function(x, is_valid) { is_miss &lt;- is.na(x) is_ok &lt;- !is_miss &amp; coalesce(is_valid, FALSE) is_bad &lt;- !is_miss &amp; !is_ok tibble(valid = sum(is_ok), missing = sum(is_miss), invalid = sum(is_bad)) }</p>
+<p>email_ok &lt;- “<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>+@[^@\\s]+\.[^@\\s]+$”</p>
+<p>before &lt;- bind_rows( count_status(messy_data<span class="math inline">\(CustomerID, str_detect(messy_data\)</span>CustomerID, “^C\d+<span class="math inline">\(")) |&gt; mutate(column = "customer_id"),
+  count_status(messy_data\)</span>Gender, messy_data<span class="math inline">\(Gender %in% c("Male", "Female")) |&gt; mutate(column = "gender"),
+  count_status(messy_data\)</span>Age, messy_data<span class="math inline">\(Age &gt;= 0 &amp; messy_data\)</span>Age &lt;= 100) |&gt; mutate(column =”age”), count_status(messy_data<span class="math inline">\(Signup_Date, !is.na(dmy(messy_data\)</span>Signup_Date, quiet = TRUE))) |&gt; mutate(column = “signup_date”), count_status(messy_data<span class="math inline">\(Last_purchase_date, !is.na(dmy(messy_data\)</span>Last_purchase_date, quiet = TRUE))) |&gt; mutate(column = “last_purchase_date”), count_status(messy_data<span class="math inline">\(purchase_amount, !messy_data\)</span>purchase_amount %in% c(“-999”, “N/A”)) |&gt; mutate(column = “purchase_amount”), count_status(messy_data<span class="math inline">\(feedback_score, messy_data\)</span>feedback_score &gt;= 0) |&gt; mutate(column = “feedback_score”), count_status(messy_data<span class="math inline">\(email, str_detect(messy_data\)</span>email, email_ok)) |&gt; mutate(column = “email”), count_status(messy_data<span class="math inline">\(Phone_number, str_detect(messy_data\)</span>Phone_number, “^\d{10}$”)) |&gt; mutate(column = “phone”) ) |&gt; mutate(stage = “Before”)</p>
+<p>after &lt;- bind_rows( count_status(clean_2<span class="math inline">\(customer_id, str_detect(clean_2\)</span>customer_id, “^C\d+<span class="math inline">\(")) |&gt; mutate(column = "customer_id"),
+  count_status(clean_2\)</span>gender, clean_2<span class="math inline">\(gender %in% c("Male", "Female")) |&gt; mutate(column = "gender"),
+  count_status(clean_2\)</span>age, clean_2<span class="math inline">\(age &gt;= 0 &amp; clean_2\)</span>age &lt;= 100) |&gt; mutate(column =”age”), count_status(clean_2<span class="math inline">\(signup_date, TRUE) |&gt; mutate(column = "signup_date"),
+  count_status(clean_2\)</span>last_purchase_date, TRUE) |&gt; mutate(column = “last_purchase_date”), count_status(clean_2<span class="math inline">\(purchase_amount, clean_2\)</span>purchase_amount &gt; 0) |&gt; mutate(column = “purchase_amount”), count_status(clean_2<span class="math inline">\(feedback_score, clean_2\)</span>feedback_score &gt;= 0) |&gt; mutate(column = “feedback_score”), count_status(clean_2<span class="math inline">\(email_cleaned, str_detect(clean_2\)</span>email_cleaned, email_ok)) |&gt; mutate(column = “email”), count_status(clean_2<span class="math inline">\(phone_number, str_detect(clean_2\)</span>phone_number, “^\d{10}$”)) |&gt; mutate(column = “phone”) ) |&gt; mutate(stage = “After”)</p>
+<p>scorecard &lt;- bind_rows(before, after) |&gt; pivot_longer(c(valid, missing, invalid), names_to = “status”, values_to = “n”) |&gt; mutate(status = factor(status, levels = c(“invalid”, “missing”, “valid”)), stage = factor(stage, levels = c(“Before”, “After”)))</p>
+<p>p &lt;- scorecard |&gt; ggplot(aes(stage, n, fill = status)) + geom_col() + geom_text( aes(label = if_else(n &gt; 0, scales::comma(n), ““)), position = position_stack(vjust = 0.5), size = 3, colour =”white” ) + facet_wrap(~column, ncol = 3) + scale_fill_manual(values = c(valid = “#2e7d32”, missing = “#757575”, invalid = “#c62828”)) + labs(title = “Data quality before vs after cleaning”, x = NULL, y = “Rows”, fill = NULL) + theme_minimal() + theme(legend.position = “bottom”)</p>
+<p>ggsave(“before_after.png”, p, width = 10, height = 8, dpi = 150) p</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>^@\s<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>^@\s<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

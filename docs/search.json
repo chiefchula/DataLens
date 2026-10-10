@@ -1,0 +1,16 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Cleaning 10,000 messy customer records",
+    "section": "",
+    "text": "rm(list = ls())"
+  },
+  {
+    "objectID": "index.html#footnotes",
+    "href": "index.html#footnotes",
+    "title": "Cleaning 10,000 messy customer records",
+    "section": "Footnotes",
+    "text": "Footnotes\n\n\n^@\\s↩︎\n^@\\s↩︎"
+  }
+]
